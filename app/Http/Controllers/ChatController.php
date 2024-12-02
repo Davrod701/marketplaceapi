@@ -29,7 +29,7 @@ class ChatController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'product_id' => 'required|exists:products,id',
+            'product_id' => 'required|exists:productos,id',
             'user_owner_id' => 'required|exists:users,id',
             'user_interested_id' => 'required|exists:users,id',
         ]);
