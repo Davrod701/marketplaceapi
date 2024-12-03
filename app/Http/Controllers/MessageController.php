@@ -19,7 +19,7 @@ class MessageController extends Controller
         $validated = $request->validate([
             'chat_id' => 'required|exists:chats,id',
             'sender_id' => 'required|exists:users,id',
-            'message' => 'required|string|max:255',
+            'message' => 'required|string',
         ]);
 
         $message = Message::create($validated);

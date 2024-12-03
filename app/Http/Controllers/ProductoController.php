@@ -11,7 +11,7 @@ class ProductoController extends Controller
     // Obtener todos los productos
     public function index()
     {
-        $productos = Producto::all();
+        $productos = Producto::where('estatus', '!=', 2)->get(); // Filtrar por status no igual a 2
         return response()->json($productos);
     }
 
@@ -58,19 +58,33 @@ class ProductoController extends Controller
     // Actualizar un producto existente
     public function update(Request $request, $id)
     {
+        // Buscar el producto por ID
         $producto = Producto::find($id);
+    
+        // Si no se encuentra el producto, retorna un error 404
         if (!$producto) {
             return response()->json(['message' => 'Producto no encontrado'], 404);
         }
-
+    
+        // Validación de los campos recibidos
         $request->validate([
             'nombre' => 'required|string|max:255',
             'precio' => 'required|numeric',
             'imagen' => 'nullable|string',
             'descripcion' => 'nullable|string|max:255',
-            'estatus' => 'required|in:1,2,3',
+            'estatus' => 'required|in:1,2,3', // Se permite estatus 1, 2 o 3
         ]);
-
+    
+        // Si el estatus se cambia a 2 (vendido), eliminamos el producto
+        if ($request->estatus == 2) {
+            // Eliminar el producto
+            $producto->delete();
+    
+            // Retornar una respuesta indicando que el producto fue eliminado
+            return response()->json(['message' => 'Producto eliminado exitosamente'], 200);
+        }
+    
+        // Si el estatus no es 2, se actualiza el producto
         $producto->update([
             'nombre' => $request->nombre,
             'precio' => $request->precio,
@@ -79,7 +93,9 @@ class ProductoController extends Controller
             'estatus' => $request->estatus,
             'user_id' => $request->user_id,
         ]);
-
+    
+        // Retornar el producto actualizado
         return response()->json($producto);
     }
+    
 }
